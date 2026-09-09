@@ -1,0 +1,125 @@
+import Product from "../models/product.model.js";
+import redis from "../config/redis.config.js";
+export async function getAllProducts(req, res) {
+  try {
+    const products = await Product.find();
+    res.status(200).json({ data: products });
+  } catch (error) {
+    console.log("Error in getAllProducts", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+export async function deleteProduct(req, res) {
+  try {
+    const { id: productId } = req.params;
+    const productToBeDeleted = await Product.findByIdAndDelete(
+      req.params.productId,
+    );
+    if (!productToBeDeleted) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    if (productToBeDeleted.productImg) {
+      const publicId = productToBeDeleted.productImg
+        .split("/")
+        .pop()
+        .split(".")[0];
+      try {
+        await cloudinary.uploader.destroy(`products/${publicId}`);
+        console.log("deleted image from cloduinary");
+      } catch (error) {
+        console.log("error deleting image from cloduinary", error);
+      }
+    }
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    console.log("Error in deleteProduct", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+export async function createProduct(req, res) {
+  try {
+    const { productName, description, price, productImg, category } = req.body;
+
+    const uploadedProductImg = await cloudinary.uploader.upload(productImg, {
+      folder: "products",
+      use_filename: true,
+    });
+    const product = new Product({
+      productName,
+      description,
+      price,
+      productImg: uploadedProductImg.secure_url,
+      category,
+    });
+    const savedProduct = await product.save();
+    res.status(201).json({ data: savedProduct });
+  } catch (error) {
+    console.log("Error in createProduct", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+export async function getProductsByCategory(req, res) {
+  try {
+    const { category } = req.params;
+    const validCategories = Product.schema.path("category").enumValues;
+    if (!validCategories.includes(category)) {
+      return res.status(400).json({ message: category + " is invalid" });
+    }
+    const products = await Product.find({ category });
+    res.status(200).json({ data: products });
+  } catch (error) {
+    console.log("Error in getProductsByCategory", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+export async function addFeaturedProducts(req, res) {
+  try {
+    const { id: productId } = req.params;
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      [{ $set: { featured: { $not: "$featured" } } }],
+      { new: true },
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    await redis.del("featured_products"); // invalidate stale cache
+
+    res.status(200).json({ data: updatedProduct });
+  } catch (error) {
+    console.log("Error in addFeaturedProducts", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+export async function addFeaturedProducts(req, res) {
+  try {
+    const { id: productId } = req.params;
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    if (product.featured === true) {
+      product.featured = false;
+      const updatedProduct = await product.save();
+      await updateFeaturedProductsCache();
+      return res.status(200).json({ data: updatedProduct });
+    }
+    product.featured = true;
+    const updatedProduct = await product.save();
+    res.status(200).json({ data: updatedProduct });
+  } catch (error) {
+    console.log("Error in addFeaturedProducts", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+async function updateFeaturedProductsCache() {
+  try {
+    const featuredProducts = await Product.find({ isFeatured: true }).lean();
+    await redis.set("featured_products", JSON.stringify(featuredProducts));
+  } catch (error) {
+    console.log("error in update cache function");
+  }
+}
