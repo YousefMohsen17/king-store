@@ -5,12 +5,14 @@ import connectDB from "./lib/db.js";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.route.js";
 import productRoutes from "./routes/product.route.js";
+import cartRoutes from "./routes/cart.route.js";
 const app = express();
 app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRoutes);
 app.use("/api/product", productRoutes);
+app.use("/api/cart", cartRoutes);
 
 app.use((err, req, res, next) => {
   if (err.name === "ValidationError") {
