@@ -121,3 +121,11 @@ export async function refreshToken(req, res) {
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
+export async function checkAuth(req, res) {
+  try {
+    res.json({ data: req.user });
+  } catch (error) {
+    console.log("error in checkAuth controller", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
