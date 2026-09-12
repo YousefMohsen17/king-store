@@ -5,7 +5,7 @@ import {
   logout,
   refreshToken,
   checkAuth,
-} from "../src/controllers/auth.controller.js";
+} from "../controllers/auth.controller.js";
 import { isAuth } from "../middlewares/auth.middleware.js";
 const router = express.Router();
 router.post("/signup", signup);

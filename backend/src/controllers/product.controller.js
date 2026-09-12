@@ -1,5 +1,5 @@
 import Product from "../models/product.model.js";
-import redis from "../config/redis.config.js";
+import { redis } from "../lib/redis.js";
 export async function getAllProducts(req, res) {
   try {
     const products = await Product.find();
@@ -75,28 +75,6 @@ export async function getProductsByCategory(req, res) {
 export async function addFeaturedProducts(req, res) {
   try {
     const { id: productId } = req.params;
-
-    const updatedProduct = await Product.findByIdAndUpdate(
-      productId,
-      [{ $set: { featured: { $not: "$featured" } } }],
-      { new: true },
-    );
-
-    if (!updatedProduct) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    await redis.del("featured_products"); // invalidate stale cache
-
-    res.status(200).json({ data: updatedProduct });
-  } catch (error) {
-    console.log("Error in addFeaturedProducts", error.message);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-}
-export async function addFeaturedProducts(req, res) {
-  try {
-    const { id: productId } = req.params;
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
@@ -121,5 +99,15 @@ async function updateFeaturedProductsCache() {
     await redis.set("featured_products", JSON.stringify(featuredProducts));
   } catch (error) {
     console.log("error in update cache function");
+  }
+}
+export async function getFeaturedProducts(req, res) {
+  try {
+    const featuredProducts = await redis.get("featured_products");
+
+    res.status(200).json({ data: JSON.parse(featuredProducts) });
+  } catch (error) {
+    console.log("Error in getFeaturedProducts", error.message);
+    return res.status(500).json({ message: "Internal server error" });
   }
 }

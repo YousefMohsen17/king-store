@@ -1,5 +1,5 @@
 import { redis } from "../lib/redis.js";
-import { User } from "../models/user.model.js";
+import User from "../models/user.model.js";
 import { generateTokens } from "../utils/generateToken.js";
 const storeRefreshToken = async (userId, refreshToken) => {
   await redis.set(

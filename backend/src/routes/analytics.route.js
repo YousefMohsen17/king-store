@@ -1,5 +1,5 @@
 import express from "express";
-import { adminRoute, protectRoute } from "../middleware/auth.middleware.js";
+import { isAdmin, isAuth } from "../middlewares/auth.middleware.js";
 import {
   getAnalyticsData,
   getDailySalesData,
@@ -7,7 +7,7 @@ import {
 
 const router = express.Router();
 
-router.get("/", protectRoute, adminRoute, async (req, res) => {
+router.get("/", isAuth, isAdmin, async (req, res) => {
   try {
     const analyticsData = await getAnalyticsData();
 
