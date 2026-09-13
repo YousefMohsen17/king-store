@@ -2,6 +2,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import SignupPage from "./pages/signup/Signup";
 import { Toaster } from "react-hot-toast";
 import Layout from "./pages/layout/Layout";
+import { AuthContextProvider } from "./context/auth/authContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 function App() {
   const router = createBrowserRouter([
     {
@@ -15,10 +17,15 @@ function App() {
       ],
     },
   ]);
+  const queryClient = new QueryClient();
   return (
     <>
-      <RouterProvider router={router} />
-      <Toaster />
+      <QueryClientProvider client={queryClient}>
+        <AuthContextProvider>
+          <RouterProvider router={router} />
+          <Toaster />
+        </AuthContextProvider>
+      </QueryClientProvider>
     </>
   );
 }
