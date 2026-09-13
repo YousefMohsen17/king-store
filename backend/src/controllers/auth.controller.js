@@ -41,6 +41,10 @@ export async function signup(req, res) {
     setCookies(res, accessToken, refreshToken);
     res.status(201).json({ data: userWithoutPassword });
   } catch (error) {
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ message: messages.join(", ") }); // ✅ 400, not 500
+    }
     console.log("error in signup controller", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
