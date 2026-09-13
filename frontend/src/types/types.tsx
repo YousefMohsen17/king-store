@@ -13,3 +13,7 @@ export interface SignupType {
   password: string;
   confirmPassword: string;
 }
+export interface LoginType {
+  email: string;
+  password: string;
+}

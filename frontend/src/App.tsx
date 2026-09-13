@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import SignupPage from "./pages/signup/Signup";
+import LoginPage from "./pages/login/LoginPage.tsx";
 import { Toaster } from "react-hot-toast";
 import Layout from "./pages/layout/Layout";
 import { AuthContextProvider } from "./context/auth/authContext";
@@ -13,6 +14,10 @@ function App() {
         {
           path: "/signup",
           element: <SignupPage />,
+        },
+        {
+          path: "/login",
+          element: <LoginPage />,
         },
       ],
     },
