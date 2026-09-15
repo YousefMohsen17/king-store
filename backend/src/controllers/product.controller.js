@@ -1,5 +1,6 @@
 import Product from "../models/product.model.js";
 import { redis } from "../lib/redis.js";
+import User from "../models/user.model.js";
 export async function getAllProducts(req, res) {
   try {
     const products = await Product.find();
@@ -70,6 +71,22 @@ export async function getProductsByCategory(req, res) {
   } catch (error) {
     console.log("Error in getProductsByCategory", error.message);
     return res.status(500).json({ message: "Internal server error" });
+  }
+}
+export async function getCategories(req, res) {
+  try {
+    const categories = Product.schema.path("category").enumValues;
+
+    res.status(200).json({
+      success: true,
+      data: categories,
+    });
+  } catch (error) {
+    console.error("Error getting categories:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
   }
 }
 export async function addFeaturedProducts(req, res) {
