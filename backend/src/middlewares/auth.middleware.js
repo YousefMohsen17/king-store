@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import User from "../models/user.model.js";
 export async function isAuth(req, res, next) {
   try {
     const token = req.cookies.accessToken;
@@ -24,6 +25,7 @@ export async function isAuth(req, res, next) {
           .status(401)
           .json({ message: "Unauthorized - Token expired" });
       }
+      throw error;
     }
   } catch (error) {
     console.log("Error in isAuth middleware", error.message);
