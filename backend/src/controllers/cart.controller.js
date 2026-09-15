@@ -1,6 +1,6 @@
 export async function addToCart(req, res) {
   try {
-    const { productId } = req.body;
+    const { productId } = req.params;
     const user = req.user;
     const existingItem = user.cartItems.find(
       (item) => item.product.toString() === productId,
