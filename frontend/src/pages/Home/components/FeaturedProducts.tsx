@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "../../../context/cart/cartContextObject";
 import type { ProductType } from "../../../types/types";
+import { ImageWithSkeleton } from "../../../components/ImageWithSkeleton";
 
 const FeaturedProducts = ({
   featuredProducts,
@@ -12,7 +13,6 @@ const FeaturedProducts = ({
   const [itemsPerPage, setItemsPerPage] = useState(4);
 
   const { addToCart } = useCart();
-
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 640) setItemsPerPage(1);
@@ -58,8 +58,8 @@ const FeaturedProducts = ({
                 >
                   <div className="bg-opacity-10 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden h-full transition-all duration-300 hover:shadow-xl border border-emerald-500/30">
                     <div className="overflow-hidden">
-                      <img
-                        src={product.image}
+                      <ImageWithSkeleton
+                        src={product.productImg}
                         alt={product.name}
                         className="w-full h-48 object-cover transition-transform duration-300 ease-in-out hover:scale-110"
                       />
