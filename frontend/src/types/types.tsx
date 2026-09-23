@@ -23,8 +23,15 @@ export interface ProductType {
   description: string;
   price: number;
   category: string;
-  isFeatured: boolean;
-  image: string;
+  featured: boolean;
+  productImg: string;
   createdAt: Date;
   updatedAt: Date;
+}
+export interface CreateProductType {
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  productImg: string;
 }
