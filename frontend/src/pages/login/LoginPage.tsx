@@ -13,7 +13,6 @@ const LoginPage = () => {
       email: formData.get("email") as string,
       password: formData.get("password") as string,
     };
-    console.log(data);
     login(data, {
       onSuccess: () => {
         e.currentTarget.reset();
