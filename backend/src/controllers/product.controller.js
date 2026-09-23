@@ -1,6 +1,6 @@
 import Product from "../models/product.model.js";
 import { redis } from "../lib/redis.js";
-import User from "../models/user.model.js";
+import cloudinary from "../lib/cloudinary.js";
 export async function getAllProducts(req, res) {
   try {
     const products = await Product.find();
@@ -12,10 +12,7 @@ export async function getAllProducts(req, res) {
 }
 export async function deleteProduct(req, res) {
   try {
-    const { id: productId } = req.params;
-    const productToBeDeleted = await Product.findByIdAndDelete(
-      req.params.productId,
-    );
+    const productToBeDeleted = await Product.findByIdAndDelete(req.params.id);
     if (!productToBeDeleted) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -30,6 +27,9 @@ export async function deleteProduct(req, res) {
       } catch (error) {
         console.log("error deleting image from cloduinary", error);
       }
+      if (productToBeDeleted.featured) {
+        await updateFeaturedProductsCache();
+      }
     }
     res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {
@@ -39,14 +39,14 @@ export async function deleteProduct(req, res) {
 }
 export async function createProduct(req, res) {
   try {
-    const { productName, description, price, productImg, category } = req.body;
+    const { name, description, price, productImg, category } = req.body;
 
     const uploadedProductImg = await cloudinary.uploader.upload(productImg, {
       folder: "products",
       use_filename: true,
     });
     const product = new Product({
-      productName,
+      name,
       description,
       price,
       productImg: uploadedProductImg.secure_url,
@@ -104,6 +104,7 @@ export async function addFeaturedProducts(req, res) {
     }
     product.featured = true;
     const updatedProduct = await product.save();
+    await updateFeaturedProductsCache();
     res.status(200).json({ data: updatedProduct });
   } catch (error) {
     console.log("Error in addFeaturedProducts", error.message);
@@ -112,7 +113,7 @@ export async function addFeaturedProducts(req, res) {
 }
 async function updateFeaturedProductsCache() {
   try {
-    const featuredProducts = await Product.find({ isFeatured: true }).lean();
+    const featuredProducts = await Product.find({ featured: true }).lean();
     await redis.set("featured_products", JSON.stringify(featuredProducts));
   } catch (error) {
     console.log("error in update cache function");
