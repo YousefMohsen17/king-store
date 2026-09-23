@@ -8,6 +8,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import HomePage from "./pages/Home/HomePage.tsx";
 import { ProductContextProvider } from "./context/product/productContext.tsx";
 import { CartContextProvider } from "./context/cart/cartContext.tsx";
+import CategoryPage from "./pages/category/CategoryPage.tsx";
+import AdminPage from "./pages/admin/AdminPage.tsx";
+// remove from featured if i del product
 function App() {
   const router = createBrowserRouter([
     {
@@ -18,6 +21,15 @@ function App() {
           path: "/",
           element: <HomePage />,
         },
+        {
+          path: "/secret-dashboard",
+          element: <AdminPage />,
+        },
+        {
+          path: "category/:category",
+          element: <CategoryPage />,
+        },
+
         {
           path: "/signup",
           element: <SignupPage />,
