@@ -33,7 +33,7 @@ export async function isAuth(req, res, next) {
   }
 }
 export async function isAdmin(req, res, next) {
-  if (req.user && req.user.role === "admin") {
+  if (req.user && req.user.type === "admin") {
     next();
   } else {
     return res.status(403).json({ message: "Unauthorized - Admin only" });
