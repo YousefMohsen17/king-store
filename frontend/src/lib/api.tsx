@@ -1,5 +1,4 @@
-// import axios from "axios";
-import type { LoginType, SignupType } from "../types/types";
+import type { CreateProductType, LoginType, SignupType } from "../types/types";
 import { axiosInstance } from "./axios";
 // /////////////////////////////////////////////////////////////////////////
 // AUTH API
@@ -33,6 +32,30 @@ export async function getFeaturedProducts() {
   const { data } = await axiosInstance.get("/product/featured");
   return data;
 }
+export async function getProductsByCategory(category: string) {
+  const { data } = await axiosInstance.get("/product/category/" + category);
+  return data;
+}
+export async function getAllProducts() {
+  const { data } = await axiosInstance.get("/product");
+  return data;
+}
+export async function deleteProduct(id: string) {
+  const { data } = await axiosInstance.delete("/product/" + id);
+  return data;
+}
+export async function toggleFeaturedProduct(id: string) {
+  const { data } = await axiosInstance.patch("/product/" + id);
+  return data;
+}
+export async function createProduct(values: CreateProductType) {
+  const { data } = await axiosInstance.post("/product", values);
+  return data;
+}
+// /////////////////////////////////////////////////////////////////////////
+// CART API
+// /////////////////////////////////////////////////////////////////////////
+
 export async function addToCart(id: string) {
   const { data } = await axiosInstance.post("/cart/" + id);
   return data;
