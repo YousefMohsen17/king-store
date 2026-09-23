@@ -15,8 +15,8 @@ router.get("/", isAuth, isAdmin, getAllProducts);
 router.get("/featured", getFeaturedProducts);
 router.get("/category/:category", getProductsByCategory);
 router.get("/categories", getCategories);
-router.post("/", isAdmin, createProduct);
-router.patch("/:id", isAdmin, addFeaturedProducts);
-router.delete("/:id", isAdmin, deleteProduct);
+router.post("/", isAuth, isAdmin, createProduct);
+router.patch("/:id", isAuth, isAdmin, addFeaturedProducts);
+router.delete("/:id", isAuth, isAdmin, deleteProduct);
 
 export default router;
