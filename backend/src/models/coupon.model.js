@@ -6,11 +6,13 @@ const couponSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      uppercase: true,
+      trim: true,
     },
     discountPercentage: {
       type: Number,
       required: true,
-      min: 0,
+      min: 1,
       max: 100,
     },
     expirationDate: {
@@ -21,18 +23,16 @@ const couponSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      unique: true,
-    },
+    // Track who already redeemed it so users cannot abuse shared codes
+    usedBy: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
-
 const Coupon = mongoose.model("Coupon", couponSchema);
 
 export default Coupon;
